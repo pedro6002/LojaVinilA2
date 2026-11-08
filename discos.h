@@ -1,3 +1,11 @@
+#include <stdio.h>
+
+#ifndef
+#define
+#endif
+
+
+
 /* ===============================================================
    MÓDULO DE REMOÇÃO E MATRIZ | INTEGRANTE C | FELIPE MARIANO BUENO
    =============================================================== */
