@@ -1,9 +1,7 @@
-#include <stdio.h>
-
 #ifndef
 #define
-#endif
 
+#include <stdio.h>
 
 
 /* ===============================================================
@@ -174,3 +172,6 @@ void gerenciarMatrizEstoque() {
         }
     } while (opcaoMatriz != 0);
 }
+
+
+#endif
