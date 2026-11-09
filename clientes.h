@@ -15,10 +15,6 @@ struct Cliente {
 struct Cliente clientes[50];
 int totalClientes = 0;
 
-/* ===============================================================
-   MÓDULO DE LEITURA, LISTAGEM E BUSCA | JOÃO VICTOR ALVES PADILHA
-   =============================================================== */
-
 void lerClientes () {
     totalClientes = 0;
 
