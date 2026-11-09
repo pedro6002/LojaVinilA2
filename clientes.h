@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <locale.h>
 
 #ifndef clientes_h
 #define clientes_h
@@ -19,6 +20,7 @@ int totalClientes = 0;
    =============================================================== */
 
 void lerClientes () {
+    totalClientes = 0;
 
     FILE *arq = fopen("clientes.csv", "r"); // Comando para iniciar leitura do arquivo .CSV
 
@@ -42,24 +44,49 @@ void lerClientes () {
     }
 }
 
-void listarClientes() {
+void cadastrarCliente() {
     lerClientes();
 
-    printf("%-5s | %-25s | %-30s | %-15s | %-10s\n",
-           "ID",
-           "NOME COMPLETO",
-           "E-MAIL",
-           "DISCOS ALUGADOS",
-           "STATUS");
-    printf("=================================================================================================\n");
+    int idExistente = 0;
+
+    printf("Digite o ID a ser cadastrado: ");
+    scanf("%d", &clientes[totalClientes].id);
+
     for (int i = 0; i < totalClientes; i++) {
-                printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
-                       clientes[i].id,
-                       clientes[i].nome_completo,
-                       clientes[i].email,
-                       clientes[i].qtd_discos_alugados,
-                       clientes[i].status == 1 ? "Ativo" : "Inativo");
-            }
+        if (clientes[totalClientes].id == clientes[i].id) {
+            printf("O ID digitado já está em uso por outro cliente! Tente novamente.");
+            idExistente = 1;
+            break;
+        }
+    }
+
+    if (idExistente == 1) {
+        return;
+    }
+
+    printf("Digite o NOME COMPLETO do cliente a ser cadastrado: ");
+    scanf(" %49[^\n]", clientes[totalClientes].nome_completo);
+
+    printf("Digite o EMAIL do cliente a ser cadastrado: ");
+    scanf(" %49[^\n]", clientes[totalClientes].email);
+
+    clientes[totalClientes].qtd_discos_alugados = 0; // Definição padrão para conta recém criada.
+    clientes[totalClientes].status = 1; // Definição padrão para conta recém criada.
+
+    totalClientes++;
+
+    FILE *arq = fopen("clientes.csv", "w");
+    for (int i = 0; i < totalClientes; i++) {
+        fprintf(arq, "%d;%s;%s;%d;%d\n",
+           clientes[i].id,
+           clientes[i].nome_completo,
+           clientes[i].email,
+           clientes[i].qtd_discos_alugados,
+           clientes[i].status);
+    }
+    fclose(arq);
+
+    printf("\nCliente cadastrado com sucesso!\n");
 }
 
 void buscarCliente() {
@@ -80,8 +107,6 @@ void buscarCliente() {
         }
     }
 
-    printf("\n\nID buscado: %s", idEncontrado == 1 ? "SIM" : "NAO");
-
     if (idEncontrado == 1) {
         printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
                clientes[posicaoId].id,
@@ -90,17 +115,36 @@ void buscarCliente() {
                clientes[posicaoId].qtd_discos_alugados,
                clientes[posicaoId].status == 1 ? "Ativo" : "Inativo");
     } else {
-        printf("O ID digitado nao corresponde a nenhum cliente cadastrado!");
+        printf("O ID digitado não corresponde a nenhum cliente cadastrado!");
     }
 
-    return idBusca, idEncontrado, posicaoId;
+    return;
+}
 
+void listarClientes() {
+    lerClientes();
+
+    printf("%-5s | %-25s | %-30s | %-15s | %-10s\n",
+           "ID",
+           "NOME COMPLETO",
+           "E-MAIL",
+           "DISCOS ALUGADOS",
+           "STATUS");
+    printf("=================================================================================================\n");
+    for (int i = 0; i < totalClientes; i++) {
+                printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
+                       clientes[i].id,
+                       clientes[i].nome_completo,
+                       clientes[i].email,
+                       clientes[i].qtd_discos_alugados,
+                       clientes[i].status == 1 ? "Ativo" : "Inativo");
+            }
 }
 
 void editarCliente () {
     lerClientes();
 
-    int idEdicao, idEncontrado ,posicaoId;
+    int idEdicao, idEncontrado ,posicaoId, opcaoAlterar;
 
     idEncontrado = 0;
 
@@ -126,17 +170,38 @@ void editarCliente () {
                clientes[posicaoId].qtd_discos_alugados,
                clientes[posicaoId].status == 1 ? "Ativo" : "Inativo");
 
-        printf("\nDigite o novo nome do cliente (Deixe o campo em branco para inalterar): ");
-        scanf(" %49[^\n]", clientes[posicaoId].nome_completo);
+        printf("\nDeseja alterar o NOME do cliente? (1 - Sim | 0 - Nao): ");
+        scanf("%d", &opcaoAlterar);
 
-        printf("\nDigite o novo email do cliente (Deixe o campo em branco para inalterar): ");
-        scanf(" %49[^\n]", clientes[posicaoId].email);
+            if (opcaoAlterar == 1) {
+                printf("\nDigite o novo nome do cliente: ");
+                scanf(" %49[^\n]", clientes[posicaoId].nome_completo);
+            }
 
-        printf("\nDigite a quantidade de discos alugados do cliente (Deixe o campo em branco para inalterar): ");
-        scanf(" %d", &clientes[posicaoId].qtd_discos_alugados);
+        printf("\nDeseja alterar o E-MAIL do cliente? (1 - Sim | 0 - Nao): ");
+        scanf("%d", &opcaoAlterar);
 
-        printf("\nInforme o status de cadastro do cliente (1 para Ativo | 0 para Inativo): ");
-        scanf(" %d", &clientes[posicaoId].status);
+            if (opcaoAlterar == 1) {
+                printf("\nDigite o novo e-mail do cliente: ");
+                scanf(" %49[^\n]", clientes[posicaoId].email);
+            }
+
+        printf("\nDeseja alterar a QUANTIDADE DE DISCOS ALUGADOS do cliente? (1 - Sim | 0 - Nao): ");
+        scanf("%d", &opcaoAlterar);
+
+            if (opcaoAlterar == 1) {
+                printf("\nDigite a quantidade de discos alugados do cliente: ");
+                scanf("%d", &clientes[posicaoId].qtd_discos_alugados);
+            }
+
+
+        printf("\nDeseja alterar a STATUS do cliente? (1 - Sim | 0 - Nao): ");
+        scanf("%d", &opcaoAlterar);
+
+            if (opcaoAlterar == 1) {
+                printf("\nDigite o status do cliente (1 para Ativo | 0 para Inativo): ");
+                scanf("%d", &clientes[posicaoId].status);
+            }
 
         FILE *arq = fopen("clientes.csv", "w");
 
@@ -154,6 +219,89 @@ void editarCliente () {
     }
 }
 
+void excluirCliente() {
+    lerClientes();
+
+    int idExclusao, posicaoId;
+    char confirmar;
+
+    posicaoId = -1;
+
+    printf("MOSTRANDO USUÁRIOS INATIVOS\n");
+    for (int i = 0; i < totalClientes; i++) {
+        if (clientes[i].status == 0) {
+            printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
+                   clientes[i].id,
+                   clientes[i].nome_completo,
+                   clientes[i].email,
+                   clientes[i].qtd_discos_alugados,
+                   clientes[i].status == 1 ? "Ativo" : "Inativo");
+        }
+    }
+
+    printf("Digite o ID do usuario a ser excluido (Digite um numero negativo para cancelar): ");
+    scanf("%d", &idExclusao);
+
+    if (idExclusao < 0) {
+        printf("Voltando ao menu principal.");
+        return;
+    }
+
+    for (int i = 0; i < totalClientes; i++) {
+        if (clientes[i].id == idExclusao) {
+            posicaoId = i;
+            break;
+        }
+    }
+    if (posicaoId != -1) {
+        printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
+               clientes[posicaoId].id,
+               clientes[posicaoId].nome_completo,
+               clientes[posicaoId].email,
+               clientes[posicaoId].qtd_discos_alugados,
+               clientes[posicaoId].status == 1 ? "Ativo" : "Inativo");
+    }
+
+        do {
+            printf("\n\nVoce deseja excluir o cliente acima? (s / n)");
+            scanf(" %c", &confirmar);
+
+            if (confirmar == 's') {
+
+                for (int j = posicaoId; j < totalClientes - 1; j++) {
+                    clientes[j] = clientes[j + 1];
+                }
+
+                totalClientes--;
+
+                FILE *arq = fopen("clientes.csv", "w");
+                for (int i = 0; i < totalClientes; i++) {
+                    fprintf(arq, "%d;%s;%s;%d;%d\n",
+                       clientes[i].id,
+                       clientes[i].nome_completo,
+                       clientes[i].email,
+                       clientes[i].qtd_discos_alugados,
+                       clientes[i].status);
+                }
+                fclose(arq);
+
+                printf("O cliente foi excluido com sucesso.");
+                return;
+            }
+
+            else if (confirmar == 'n') {
+                printf("Operacao de exclusao abortada.");
+                return;
+            }
+
+            else {
+                printf("Comando nao reconhecido. Tente novamente.");
+            }
+
+        } while (confirmar != 's' && confirmar != 'n');
+
+}
+
 /* ===============================================================
    MENU DO MÓDULO
    =============================================================== */
@@ -161,7 +309,7 @@ void editarCliente () {
 void opcaoMenuClientes (int opcao) {
     switch (opcao) {
     case 1:
-        /* cadastrarCliente();*/
+        cadastrarCliente();
         break;
 
     case 2:
@@ -177,7 +325,7 @@ void opcaoMenuClientes (int opcao) {
         break;
 
     case 5:
-        /*excluirCliente();*/
+        excluirCliente();
         break;
 
     case 0:
@@ -185,34 +333,46 @@ void opcaoMenuClientes (int opcao) {
         break;
 
     default:
-        printf("Opcao desconhecida. Tente novamente.");
+        printf("Opção desconhecida. Tente novamente.");
         break;
     }
 }
 
-int menuClientes() {
+void menuClientes() {
 
     int opcao;
 
-    printf("\n");
-    printf("============================================================\n");
-    printf("                  GERENCIAMENTO DE CLIENTES                 \n");
-    printf("============================================================\n\n");
+    do {
+        printf("\n");
+        printf("============================================================\n");
+        printf("                  GERENCIAMENTO DE CLIENTES                 \n");
+        printf("============================================================\n\n");
 
-    printf(" 1 - Cadastrar novo cliente;\n");
-    printf(" 2 - Buscar cliente;\n");
-    printf(" 3 - Listar todos os clientes;\n");
-    printf(" 4 - Editar dados de cliente;\n");
-    printf(" 5 - Excluir ou desativar cliente;\n");
+        printf(" 1 - Cadastrar novo cliente;\n");
+        printf(" 2 - Buscar cliente;\n");
+        printf(" 3 - Listar todos os clientes;\n");
+        printf(" 4 - Editar dados de cliente;\n");
+        printf(" 5 - Excluir cliente;\n");
 
-    printf("\n 0 - Voltar ao menu principal;\n");
+        printf("\n 0 - Voltar ao menu principal;\n");
 
-    printf("\n============================================================\n");
-    printf(" Escolha uma opcao: ");
-    scanf("%d", &opcao);
-    system("cls");
+        printf("\n============================================================\n");
+        printf(" Escolha uma opcao: ");
+        scanf("%d", &opcao);
+        system("cls");
 
-    opcaoMenuClientes(opcao);
+        opcaoMenuClientes(opcao);
+
+        if (opcao != 0) {
+            printf("\nPressione Enter para continuar...");
+            getchar();
+            getchar();
+            system("cls");
+        }
+
+    } while (opcao != 0);
+
+    return;
 }
 
 #endif
