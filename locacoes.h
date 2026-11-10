@@ -10,7 +10,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
 #include "clientes.h"
 #include "discos.h"
 
@@ -47,13 +46,13 @@ void salvarLocacoesCSV() {
 void carregarLocacoesCSV() {
     FILE *arquivo = fopen("locacoes.csv", "r");
     if (arquivo == NULL) {
-        
+        printf("\n[AVISO] Arquivo locacoes.csv nao encontrado. Um novo sera criado ao salvar.\n");
         totalLocacoes = 0;
         return;
     }
 
     totalLocacoes = 0;
-    while (totalLocacoes < 50 && fscanf(arquivo, "%d;%d;[^;];%d;%f\n",
+    while (totalLocacoes < 50 && fscanf(arquivo, "%d;%d;%19[^;];%d;%f\n",
                   &historicoLocacoes[totalLocacoes].idLocacao,
                   &historicoLocacoes[totalLocacoes].idClienteLocador,
                   historicoLocacoes[totalLocacoes].codigoVinil,
@@ -83,6 +82,7 @@ void ordenarLocacoesPorDias() {
 void menuLocacoes() {
     int opcaoModulo;
     int i;
+    int idDiscoDigitado;
     struct LocacaoVinil novaLocacao;
 
     do {
@@ -108,10 +108,9 @@ void menuLocacoes() {
                     printf("ID do Cliente: ");
                     scanf("%d", &novaLocacao.idClienteLocador);
                     
-                    
                     int clienteExiste = 0;
                     for (i = 0; i < totalClientes; i++) { 
-                        if (listaClientes[i].idCliente == novaLocacao.idClienteLocador && listaClientes[i].ativo == 1) {
+                        if (clientes[i].id == novaLocacao.idClienteLocador && clientes[i].status == 1) {
                             clienteExiste = 1;
                             break;
                         }
@@ -122,25 +121,24 @@ void menuLocacoes() {
                         break;
                     }
 
-                    printf("Codigo do Vinil (Sem espacos): ");
-                    scanf("%s", novaLocacao.codigoVinil);
-                    
+                    printf("ID do Disco do Felipe: ");
+                    scanf("%d", &idDiscoDigitado);
                     
                     int discoDisponivel = 0;
                     for (i = 0; i < totalDiscos; i++) { 
-                        if (strcmp(catalogoDiscos[i].codigo, novaLocacao.codigoVinil) == 0) {
-                            if (catalogoDiscos[i].disponivel == 1) {
-                                discoDisponivel = 1;
-                                
-                                catalogoDiscos[i].disponivel = 0; 
-                                salvarDiscosCSV(); 
-                            }
+                        if (discos[i].id == idDiscoDigitado && discos[i].status == 1) {
+                            discoDisponivel = 1;
+                            discos[i].status = 0; 
+                            salvarDiscosCSV(); 
+                            
+                            // Copia o código textual do vinil do Felipe para o registro de locação
+                            strcpy(novaLocacao.codigoVinil, discos[i].codigo);
                             break;
                         }
                     }
 
                     if (!discoDisponivel) {
-                        printf("\n[ERRO] Disco codigo '%s' nao encontrado ou ja esta alugado!\n", novaLocacao.codigoVinil);
+                        printf("\n[ERRO] Disco ID %d nao encontrado ou ja esta alugado!\n", idDiscoDigitado);
                         break;
                     }
 
@@ -154,7 +152,7 @@ void menuLocacoes() {
                     historicoLocacoes[totalLocacoes] = novaLocacao;
                     totalLocacoes++;
                     
-                    salvarLocacoesCSV(); // Salva a nova locação em disco imediatamente
+                    salvarLocacoesCSV(); 
                     printf("\nLocacao salva com sucesso e persistida em arquivo!\n");
                 }
                 break;
@@ -208,4 +206,5 @@ void menuLocacoes() {
 }
 
 #endif
+
 
