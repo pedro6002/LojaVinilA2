@@ -4,8 +4,15 @@
 // Autor: Braian hladczuk - RGM: 04746379-1
 // ============================================================================
 
+#ifndef LOCACOES_H
+#define LOCACOES_H
+
 #include <stdio.h>
 #include <string.h>
+
+
+#include "clientes.h"
+#include "discos.h"
 
 struct LocacaoVinil {
     int idLocacao;
@@ -18,14 +25,44 @@ struct LocacaoVinil {
 struct LocacaoVinil historicoLocacoes[50];
 int totalLocacoes = 0;
 
-struct Cliente { int id; char nome[50]; }; struct Cliente listaClientes[50];
-struct VinilCatalogo { int id; char titulo[50]; }; struct VinilCatalogo estoqueVinis[50];
-struct Fornecedor { int id; char empresa[50]; }; struct Fornecedor listaFornecedores[50];
+void salvarLocacoesCSV() {
+    FILE *arquivo = fopen("locacoes.csv", "w");
+    if (arquivo == NULL) {
+        printf("\n[ERRO] Nao foi possivel abrir o arquivo locacoes.csv para escrita.\n");
+        return;
+    }
 
-void exibirCabecalho() {
-    printf("\n======================================================\n");
-    printf("     VINYL PALACE - SISTEMA DE GESTAO RETRO (1985)    \n");
-    printf("======================================================\n");
+    for (int i = 0; i < totalLocacoes; i++) {
+        fprintf(arquivo, "%d;%d;%s;%d;%.2f\n",
+                historicoLocacoes[i].idLocacao,
+                historicoLocacoes[i].idClienteLocador,
+                historicoLocacoes[i].codigoVinil,
+                historicoLocacoes[i].diasAlugados,
+                historicoLocacoes[i].valorLocacao);
+    }
+
+    fclose(arquivo);
+}
+
+void carregarLocacoesCSV() {
+    FILE *arquivo = fopen("locacoes.csv", "r");
+    if (arquivo == NULL) {
+        
+        totalLocacoes = 0;
+        return;
+    }
+
+    totalLocacoes = 0;
+    while (totalLocacoes < 50 && fscanf(arquivo, "%d;%d;[^;];%d;%f\n",
+                  &historicoLocacoes[totalLocacoes].idLocacao,
+                  &historicoLocacoes[totalLocacoes].idClienteLocador,
+                  historicoLocacoes[totalLocacoes].codigoVinil,
+                  &historicoLocacoes[totalLocacoes].diasAlugados,
+                  &historicoLocacoes[totalLocacoes].valorLocacao) == 5) {
+        totalLocacoes++;
+    }
+
+    fclose(arquivo);
 }
 
 void ordenarLocacoesPorDias() {
@@ -43,18 +80,21 @@ void ordenarLocacoesPorDias() {
     }
 }
 
-void moduloLocacaoEOperacoes() {
+void menuLocacoes() {
     int opcaoModulo;
     int i;
     struct LocacaoVinil novaLocacao;
 
     do {
-        printf("\n--- [MODULO 4: LOCACAO E OPERACOES (Sua Perspectiva)] ---\n");
+        printf("\n======================================================\n");
+        printf("     SISTEMA RETRO (1985) - MODULO DE LOCACOES        \n");
+        printf("======================================================\n");
         printf("1. Alugar Novo Vinil (Balcao)\n");
         printf("2. Listar Locacoes (Ordem de Insercao)\n");
-        printf("3. Relatorio: Alugueis Mais Longos (Ordenado por Bubble Sort)\n");
+        printf("3. Relatorio: Alugueis Mais Longos (Bubble Sort)\n");
         printf("4. Relatorio: Receita Total de Locacoes\n");
         printf("0. Voltar ao Menu Principal\n");
+        printf("======================================================\n");
         printf("Escolha uma acao: ");
         scanf("%d", &opcaoModulo);
 
@@ -64,23 +104,58 @@ void moduloLocacaoEOperacoes() {
                     printf("\n[ERRO] Vetor cheio na memoria RAM!\n");
                 } else {
                     printf("\n--- Registrar Novo Aluguel ---\n");
-                    novaLocacao.idLocacao = totalLocacoes + 1;
                     
                     printf("ID do Cliente: ");
                     scanf("%d", &novaLocacao.idClienteLocador);
                     
+                    
+                    int clienteExiste = 0;
+                    for (i = 0; i < totalClientes; i++) { 
+                        if (listaClientes[i].idCliente == novaLocacao.idClienteLocador && listaClientes[i].ativo == 1) {
+                            clienteExiste = 1;
+                            break;
+                        }
+                    }
+                    
+                    if (!clienteExiste) {
+                        printf("\n[ERRO] Cliente ID %d nao encontrado ou inativo!\n", novaLocacao.idClienteLocador);
+                        break;
+                    }
+
                     printf("Codigo do Vinil (Sem espacos): ");
                     scanf("%s", novaLocacao.codigoVinil);
                     
+                    
+                    int discoDisponivel = 0;
+                    for (i = 0; i < totalDiscos; i++) { 
+                        if (strcmp(catalogoDiscos[i].codigo, novaLocacao.codigoVinil) == 0) {
+                            if (catalogoDiscos[i].disponivel == 1) {
+                                discoDisponivel = 1;
+                                
+                                catalogoDiscos[i].disponivel = 0; 
+                                salvarDiscosCSV(); 
+                            }
+                            break;
+                        }
+                    }
+
+                    if (!discoDisponivel) {
+                        printf("\n[ERRO] Disco codigo '%s' nao encontrado ou ja esta alugado!\n", novaLocacao.codigoVinil);
+                        break;
+                    }
+
                     printf("Tempo de Emprestimo (Dias): ");
                     scanf("%d", &novaLocacao.diasAlugados);
                     
                     printf("Valor Cobrado (R$): ");
                     scanf("%f", &novaLocacao.valorLocacao);
 
+                    novaLocacao.idLocacao = totalLocacoes + 1;
                     historicoLocacoes[totalLocacoes] = novaLocacao;
                     totalLocacoes++;
-                    printf("\nLocacao salva com sucesso na RAM!\n");
+                    
+                    salvarLocacoesCSV(); // Salva a nova locação em disco imediatamente
+                    printf("\nLocacao salva com sucesso e persistida em arquivo!\n");
                 }
                 break;
 
@@ -132,46 +207,5 @@ void moduloLocacaoEOperacoes() {
     } while (opcaoModulo != 0);
 }
 
-void moduloClientes() { printf("\n[MENU] Entrou no modulo do Integrante A (Gestao de Clientes).\n"); }
-void moduloCatalogo() { printf("\n[MENU] Entrou no modulo do Integrante B (Catalogo de Vinis).\n"); }
-void moduloFornecedores() { printf("\n[MENU] Entrou no modulo do Integrante C (Estoque e Insumos).\n"); }
+#endif
 
-int main() {
-    int opcaoMenuPrincipal;
-
-    do {
-        exibirCabecalho();
-        printf("1. Gerenciar Clientes (Integrante A)\n");
-        printf("2. Catalogo de Discos (Integrante B)\n");
-        printf("3. Estoque e Fornecedores (Integrante C)\n");
-        printf("4. Locacao e Relatorios Analiticos (Sua Perspectiva - Integrante D)\n");
-        printf("0. Encerrar o Sistema\n");
-        printf("Escolha o modulo que deseja acessar: ");
-        scanf("%d", &opcaoMenuPrincipal);
-
-        switch (opcaoMenuPrincipal) {
-            case 1:
-                moduloClientes();
-                break;
-            case 2:
-                moduloCatalogo();
-                break;
-            case 3:
-                moduloFornecedores();
-                break;
-            case 4:
-                moduloLocacaoEOperacoes();
-                break;
-            case 0:
-                printf("\n======================================================\n");
-                printf("   Sistema Encerrado. Obrigado por utilizar o Vinyl Palace! \n");
-                printf("======================================================\n");
-                break;
-            default:
-                printf("\n[AVISO] Opcao invalida no Menu Principal! Tente novamente.\n");
-                break;
-        }
-    } while (opcaoMenuPrincipal != 0);
-
-    return 0;
-}
