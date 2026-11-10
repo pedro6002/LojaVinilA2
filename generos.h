@@ -16,6 +16,24 @@ struct Genero {
 struct Genero listaGeneros[MAX_GENEROS];
 int totalGeneros = 0;
 
+void salvarGenerosCSV() {
+    FILE *arq = fopen("generos.csv", "w");
+    if (arq == NULL) {
+        printf("[ERRO] Nao foi possivel abrir generos.csv para escrita!\n");
+        return;
+    }
+
+    for (int i = 0; i < totalGeneros; i++) {
+        fprintf(arq, "%d;%s;%s\n", 
+                listaGeneros[i].codigo, 
+                listaGeneros[i].nome, 
+                listaGeneros[i].descricao);
+    }
+
+    fclose(arq);
+    printf("[SISTEMA] %d generos salvos em 'generos.csv'!\n", totalGeneros);
+}
+
 void cadastrarGeneroMemoria() {
     if (totalGeneros >= MAX_GENEROS) {
         printf("[ERRO] Limite de generos atingido!\n");
@@ -35,24 +53,8 @@ void cadastrarGeneroMemoria() {
 
     totalGeneros++;
     printf("Genero cadastrado com sucesso!\n");
-}
-
-void salvarGenerosCSV() {
-    FILE *arq = fopen("generos.csv", "w");
-    if (arq == NULL) {
-        printf("[ERRO] Nao foi possivel abrir generos.csv para escrita!\n");
-        return;
-    }
-
-    for (int i = 0; i < totalGeneros; i++) {
-        fprintf(arq, "%d;%s;%s\n", 
-                listaGeneros[i].codigo, 
-                listaGeneros[i].nome, 
-                listaGeneros[i].descricao);
-    }
-
-    fclose(arq);
-    printf("[SISTEMA] %d generos salvos em 'generos.csv'!\n", totalGeneros);
+    
+    salvarGenerosCSV();
 }
 
 void carregarGenerosCSV() {
@@ -150,7 +152,6 @@ void excluirGenero() {
 void menuGeneros() {
     carregarGenerosCSV();
     int op;
-    int c;
 
     do {
         #ifdef _WIN32
@@ -175,7 +176,6 @@ void menuGeneros() {
         switch (op) {
             case 1:
                 cadastrarGeneroMemoria();
-                salvarGenerosCSV();
                 break;
             case 2:
                 listarGeneros();
@@ -197,7 +197,6 @@ void menuGeneros() {
         
         if (op != 0) {
             printf("\nPressione ENTER para continuar...");
-            while ((c = getchar()) != '\n' && c != EOF);
             getchar();
         }
 
