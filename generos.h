@@ -1,12 +1,11 @@
-#ifndef generos_h
-#define generos_h
+#ifndef GENEROS_H
+#define GENEROS_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#define max_generos 50
-
+#define MAX_GENEROS 50
 
 struct Genero {
     int codigo;
@@ -14,8 +13,7 @@ struct Genero {
     char descricao[60];
 };
 
-
-struct Genero listaGeneros[max_generos];
+struct Genero listaGeneros[MAX_GENEROS];
 int totalGeneros = 0;
 
 void cadastrarGeneroMemoria() {
@@ -54,13 +52,12 @@ void salvarGenerosCSV() {
     }
 
     fclose(arq);
-    printf("[DISCO] %d generos salvos em 'generos.csv'!\n", totalGeneros);
+    printf("[SISTEMA] %d generos salvos em 'generos.csv'!\n", totalGeneros);
 }
 
 void carregarGenerosCSV() {
     FILE *arq = fopen("generos.csv", "r");
     if (arq == NULL) {
-        
         return;
     }
 
@@ -92,14 +89,87 @@ void listarGeneros() {
     }
 }
 
+void buscarGenero() {
+    int cod;
+    printf("\nDigite o codigo do genero para buscar: ");
+    scanf("%d", &cod);
+    
+    for(int i = 0; i < totalGeneros; i++) {
+        if(listaGeneros[i].codigo == cod) {
+            printf("\n--- GENERO ENCONTRADO ---\n");
+            printf("Codigo: %d\n", listaGeneros[i].codigo);
+            printf("Nome: %s\n", listaGeneros[i].nome);
+            printf("Descricao: %s\n", listaGeneros[i].descricao);
+            return;
+        }
+    }
+    printf("[ERRO] Genero nao encontrado.\n");
+}
+
+void editarGenero() {
+    int cod;
+    printf("\nDigite o codigo do genero para editar: ");
+    scanf("%d", &cod);
+    
+    for(int i = 0; i < totalGeneros; i++) {
+        if(listaGeneros[i].codigo == cod) {
+            printf("\n--- EDITANDO: %s ---\n", listaGeneros[i].nome);
+            printf("Novo nome do genero (ex: Rock, Jazz): ");
+            scanf(" %39[^\n]", listaGeneros[i].nome);
+
+            printf("Nova descricao / Caracteristica: ");
+            scanf(" %59[^\n]", listaGeneros[i].descricao);
+
+            printf("Genero atualizado com sucesso!\n");
+            salvarGenerosCSV();
+            return;
+        }
+    }
+    printf("[ERRO] Genero nao encontrado para edicao.\n");
+}
+
+void excluirGenero() {
+    int cod;
+    printf("\nDigite o codigo do genero para excluir: ");
+    scanf("%d", &cod);
+    
+    for(int i = 0; i < totalGeneros; i++) {
+        if(listaGeneros[i].codigo == cod) {
+            for(int j = i; j < totalGeneros - 1; j++) {
+                listaGeneros[j] = listaGeneros[j + 1];
+            }
+            totalGeneros--;
+            printf("Genero excluido com sucesso!\n");
+            salvarGenerosCSV();
+            return;
+        }
+    }
+    printf("[ERRO] Genero nao encontrado para exclusao.\n");
+}
+
 void menuGeneros() {
+    carregarGenerosCSV();
     int op;
+    int c;
+
     do {
-        printf("\n--- MENU GENEROS ---\n");
-        printf("1. Cadastrar Genero\n");
-        printf("2. Listar Generos\n");
-        printf("0. Voltar ao Menu Principal\n");
-        printf("Escolha: ");
+        #ifdef _WIN32
+            system("cls");
+        #else
+            system("clear");
+        #endif
+        
+        printf("============================================================\n");
+        printf("                      MENU DE GENEROS                       \n");
+        printf("============================================================\n");
+        printf(" 1. Cadastrar Genero\n");
+        printf(" 2. Listar Generos\n");
+        printf(" 3. Buscar Genero\n");
+        printf(" 4. Editar Genero\n");
+        printf(" 5. Excluir Genero\n");
+        printf(" 0. Voltar ao Menu Principal\n");
+        printf("============================================================\n");
+        printf("Escolha uma opcao: ");
         scanf("%d", &op);
 
         switch (op) {
@@ -110,11 +180,27 @@ void menuGeneros() {
             case 2:
                 listarGeneros();
                 break;
+            case 3:
+                buscarGenero();
+                break;
+            case 4:
+                editarGenero();
+                break;
+            case 5:
+                excluirGenero();
+                break;
             case 0:
                 break;
             default:
                 printf("Opcao invalida!\n");
         }
+        
+        if (op != 0) {
+            printf("\nPressione ENTER para continuar...");
+            while ((c = getchar()) != '\n' && c != EOF);
+            getchar();
+        }
+
     } while (op != 0);
 }
 
