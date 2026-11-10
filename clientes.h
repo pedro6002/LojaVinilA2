@@ -1,8 +1,8 @@
+#ifndef CLIENTES_H
+#define CLIENTES_H
+
 #include <stdio.h>
 #include <locale.h>
-
-#ifndef clientes_h
-#define clientes_h
 
 struct Cliente {
     int id;
@@ -14,6 +14,10 @@ struct Cliente {
 
 struct Cliente clientes[50];
 int totalClientes = 0;
+
+/* ===============================================================
+   MÓDULO DE LEITURA, LISTAGEM E BUSCA | JOÃO VICTOR ALVES PADILHA
+   =============================================================== */
 
 void lerClientes () {
     totalClientes = 0;
@@ -43,13 +47,20 @@ void lerClientes () {
 void cadastrarCliente() {
     lerClientes();
 
-    int idExistente = 0;
+    int idExistente, idTemp;
+
+    if (totalClientes >= 50) {
+        printf("Limite maximo de clientes atingido (50)!\n");
+        return;
+    }
+
+    idExistente = 0;
 
     printf("Digite o ID a ser cadastrado: ");
-    scanf("%d", &clientes[totalClientes].id);
+    scanf("%d", &idTemp);
 
     for (int i = 0; i < totalClientes; i++) {
-        if (clientes[totalClientes].id == clientes[i].id) {
+        if (idTemp == clientes[i].id) {
             printf("O ID digitado já está em uso por outro cliente! Tente novamente.");
             idExistente = 1;
             break;
@@ -57,8 +68,11 @@ void cadastrarCliente() {
     }
 
     if (idExistente == 1) {
+        idExistente = 0;
         return;
     }
+
+    clientes[totalClientes].id = idTemp;
 
     printf("Digite o NOME COMPLETO do cliente a ser cadastrado: ");
     scanf(" %49[^\n]", clientes[totalClientes].nome_completo);
@@ -72,6 +86,12 @@ void cadastrarCliente() {
     totalClientes++;
 
     FILE *arq = fopen("clientes.csv", "w");
+
+    if (arq == NULL) {
+        printf("Erro ao abrir o arquivo para escrita!");
+        return;
+    }
+
     for (int i = 0; i < totalClientes; i++) {
         fprintf(arq, "%d;%s;%s;%d;%d\n",
            clientes[i].id,
@@ -80,6 +100,7 @@ void cadastrarCliente() {
            clientes[i].qtd_discos_alugados,
            clientes[i].status);
     }
+
     fclose(arq);
 
     printf("\nCliente cadastrado com sucesso!\n");
@@ -155,8 +176,6 @@ void editarCliente () {
         }
     }
 
-
-
     if (idEncontrado == 1) {
         printf("DADOS ATUAIS DO CLIENTE\n");
         printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
@@ -201,6 +220,12 @@ void editarCliente () {
 
         FILE *arq = fopen("clientes.csv", "w");
 
+        if (arq == NULL) {
+            printf("Erro ao abrir o arquivo para edição!");
+            return;
+        }
+
+
         for (int i = 0; i < totalClientes; i++) {
             fprintf(arq, "%d;%s;%s;%d;%d\n",
                clientes[i].id,
@@ -212,6 +237,11 @@ void editarCliente () {
 
         fclose(arq);
 
+    }
+
+    else {
+        printf("Cliente não encontrado!");
+        return;
     }
 }
 
@@ -257,6 +287,10 @@ void excluirCliente() {
                clientes[posicaoId].qtd_discos_alugados,
                clientes[posicaoId].status == 1 ? "Ativo" : "Inativo");
     }
+    else{
+        printf("Cliente não encontrado!");
+        return;
+    }
 
         do {
             printf("\n\nVoce deseja excluir o cliente acima? (s / n)");
@@ -271,6 +305,11 @@ void excluirCliente() {
                 totalClientes--;
 
                 FILE *arq = fopen("clientes.csv", "w");
+
+                if (arq == NULL) {
+                    printf("Erro ao abrir o arquivo para exclusão de dados!");
+                    return;
+                }
                 for (int i = 0; i < totalClientes; i++) {
                     fprintf(arq, "%d;%s;%s;%d;%d\n",
                        clientes[i].id,
@@ -296,6 +335,18 @@ void excluirCliente() {
 
         } while (confirmar != 's' && confirmar != 'n');
 
+}
+
+/* ===============================================================
+   FUNÇÕES AUXILIARES
+   =============================================================== */
+
+void limparTela() {
+    #ifdef _WIN32
+        system("cls");
+    #else
+        system("clear");
+    #endif
 }
 
 /* ===============================================================
@@ -355,7 +406,7 @@ void menuClientes() {
         printf("\n============================================================\n");
         printf(" Escolha uma opcao: ");
         scanf("%d", &opcao);
-        system("cls");
+        limparTela();
 
         opcaoMenuClientes(opcao);
 
@@ -363,7 +414,7 @@ void menuClientes() {
             printf("\nPressione Enter para continuar...");
             getchar();
             getchar();
-            system("cls");
+            limparTela();
         }
 
     } while (opcao != 0);
