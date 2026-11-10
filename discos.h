@@ -6,22 +6,23 @@
 #include <string.h>
 
 /* ===============================================================
-   1. ESTRUTURA E VARIÁVEIS GLOBAIS DO DOMÍNIO (DISCOS)
+   1. ESTRUTURA E VARIÁVEIS GLOBAIS (ACESSO PÚBLICO PARA LOCAÇÕES)
    =============================================================== */
 
 struct Disco {
-    int id;
-    char titulo[50];
-    char artista[50];
-    float preco_locacao;
-    int id_genero;
-    int status; // 1 - Disponivel, 0 - Alugado / Inativo
+    int id;               // ID único do vinil
+    char titulo[50];      // Título do álbum
+    char artista[50];     // Artista / Banda
+    float preco_locacao;  // Valor da diária de locação
+    int id_genero;        // 0: Rock, 1: Jazz, 2: Pop, 3: MPB
+    int status;           // 1 = Disponível, 0 = Alugado / Inativo
 };
 
+// Vetor global e totalizadores públicos para integração com o Módulo de Locações
 struct Disco discos[50];
 int totalDiscos = 0;
 
-// Matriz do Integrante C: Grade de Controle do Estoque (4 Generos x 4 Prateleiras)
+// Grade de Controle de Estoque por Mostruário (4 Gêneros x 4 Prateleiras)
 int matrizPrateleiras[4][4];
 
 /* ===============================================================
@@ -103,7 +104,7 @@ void cadastrarDisco() {
     printf("Digite o ID do disco: ");
     scanf("%d", &novo.id);
 
-    // Valida se o ID ja existe
+    // Valida se o ID já existe
     for (int i = 0; i < totalDiscos; i++) {
         if (discos[i].id == novo.id) {
             printf("\n[ERRO] Ja existe um disco cadastrado com o ID %d!\n", novo.id);
@@ -123,7 +124,7 @@ void cadastrarDisco() {
     printf("Digite o ID do Genero (0: Rock, 1: Jazz, 2: Pop, 3: MPB): ");
     scanf("%d", &novo.id_genero);
 
-    novo.status = 1; // Disponivel por padrao
+    novo.status = 1; // Disponível por padrão
 
     discos[totalDiscos] = novo;
     totalDiscos++;
@@ -172,9 +173,9 @@ void buscarDisco() {
         }
     }
 
-    printf("\nID buscado: %s\n", idEncontrado == 1 ? "ENCONTRADO" : "NAO ENCONTRADO");
-
+    // Exibição ajustada: O resultado é impresso após o laço for dentro do bloco condicional
     if (idEncontrado == 1) {
+        printf("\nID buscado: ENCONTRADO\n");
         printf("\n%-5s | %-25s | %-20s | %-12s | %-8s | %-12s\n",
                "ID", "TITULO", "ARTISTA", "PRECO (R$)", "GENERO", "STATUS");
         printf("---------------------------------------------------------------------------------------------\n");
@@ -186,6 +187,7 @@ void buscarDisco() {
                discos[posicaoId].id_genero,
                discos[posicaoId].status == 1 ? "Disponivel" : "Indisponivel");
     } else {
+        printf("\nID buscado: NAO ENCONTRADO\n");
         printf("O ID digitado nao corresponde a nenhum disco no acervo!\n");
     }
 }
