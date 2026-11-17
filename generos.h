@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #define MAX_GENEROS 50
 
@@ -197,6 +198,7 @@ void menuGeneros() {
         
         if (op != 0) {
             printf("\nPressione ENTER para continuar...");
+            getchar();
             getchar();
         }
 
