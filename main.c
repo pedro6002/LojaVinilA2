@@ -35,6 +35,7 @@ int main() {
 
     lerClientes();
     carregarDiscosCSV();
+    carregarGenerosCSV();
     carregarLocacoesCSV();
 
     int opcao_menu;
