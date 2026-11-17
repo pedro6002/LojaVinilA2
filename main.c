@@ -7,33 +7,37 @@
 #include "generos.h"
 #include "locacoes.h"
 
+void selecionarMenu(int opcao) {
+    switch (opcao) {
+        case 1:
+            menuClientes();
+            break;
+        case 2:
+            menuDiscos();
+            break;
+        case 3:
+            menuGeneros();
+            break;
+        case 4:
+            menuLocacoes();
+            break;
+        case 0:
+            break;
+        default:
+            printf("\nComando não identificado. Tente novamente.");
+            break;
+
+    }
+}
+
 int main() {
-    setlocale(LC_CTYPE, "Portuguese");
+    setlocale(LC_CTYPE, "");
+
+    lerClientes();
+    carregarDiscosCSV();
+    carregarLocacoesCSV();
 
     int opcao_menu;
-
-    void selecionarMenu(int opcao) {
-        switch (opcao) {
-            case 1:
-                menuClientes();
-                break;
-            case 2:
-                menuDiscos();
-                break;
-            case 3:
-                menuGeneros();
-                break;
-            case 4:
-                menuLocacoes();
-                break;
-            case 0:
-                break;
-            default:
-                printf("\nComando não identificado. Tente novamente.");
-                break;
-
-        }
-    }
 
     do {
         printf("\n");
