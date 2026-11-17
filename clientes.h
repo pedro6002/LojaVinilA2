@@ -44,6 +44,26 @@ void lerClientes () {
     }
 }
 
+void listarClientes() {
+    lerClientes();
+
+    printf("%-5s | %-25s | %-30s | %-15s | %-10s\n",
+           "ID",
+           "NOME COMPLETO",
+           "E-MAIL",
+           "DISCOS ALUGADOS",
+           "STATUS");
+    printf("=================================================================================================\n");
+    for (int i = 0; i < totalClientes; i++) {
+                printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
+                       clientes[i].id,
+                       clientes[i].nome_completo,
+                       clientes[i].email,
+                       clientes[i].qtd_discos_alugados,
+                       clientes[i].status == 1 ? "Ativo" : "Inativo");
+            }
+}
+
 void cadastrarCliente() {
     lerClientes();
 
@@ -108,6 +128,7 @@ void cadastrarCliente() {
 
 void buscarCliente() {
     lerClientes();
+    listarClientes();
 
     int idBusca, idEncontrado, posicaoId;
 
@@ -138,28 +159,9 @@ void buscarCliente() {
     return;
 }
 
-void listarClientes() {
-    lerClientes();
-
-    printf("%-5s | %-25s | %-30s | %-15s | %-10s\n",
-           "ID",
-           "NOME COMPLETO",
-           "E-MAIL",
-           "DISCOS ALUGADOS",
-           "STATUS");
-    printf("=================================================================================================\n");
-    for (int i = 0; i < totalClientes; i++) {
-                printf("%-5d | %-25s | %-30s | %-15d | %-10s\n",
-                       clientes[i].id,
-                       clientes[i].nome_completo,
-                       clientes[i].email,
-                       clientes[i].qtd_discos_alugados,
-                       clientes[i].status == 1 ? "Ativo" : "Inativo");
-            }
-}
-
 void editarCliente () {
     lerClientes();
+    listarClientes();
 
     int idEdicao, idEncontrado ,posicaoId, opcaoAlterar;
 
