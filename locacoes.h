@@ -4,6 +4,8 @@
 // Autor: Braian Hladczuk - RGM: 04746379-1
 // ============================================================================
 
+#include <locale.h>
+
 #ifndef LOCACOES_H
 #define LOCACOES_H
 
