@@ -4,6 +4,8 @@
 // Autor: Braian Hladczuk - RGM: 04746379-1
 // ============================================================================
 
+#include <locale.h>
+
 #ifndef LOCACOES_H
 #define LOCACOES_H
 
@@ -133,7 +135,7 @@ void menuLocacoes() {
                         break;
                     }
 
-                    printf("ID do Disco do Felipe: ");
+                    printf("ID do Disco: ");
                     scanf("%d", &idDiscoDigitado);
                     
                     int discoDisponivel = 0;
