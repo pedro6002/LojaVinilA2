@@ -4,7 +4,7 @@
 // Autor: Braian Hladczuk - RGM: 04746379-1
 // ============================================================================
 
-#include <locale.h>
+ #include <locale.h>
 
 #ifndef LOCACOES_H
 #define LOCACOES_H
@@ -135,14 +135,17 @@ void menuLocacoes() {
                         break;
                     }
 
-                    printf("ID do Disco: ");
+                    printf("ID do Disco do Felipe: ");
                     scanf("%d", &idDiscoDigitado);
                     
                     int discoDisponivel = 0;
+                    float precoDiariaDisco = 0.0; // Guarda o valor do disco para multiplicar pelos dias
+
                     for (i = 0; i < totalDiscos; i++) { 
                         if (discos[i].id == idDiscoDigitado && discos[i].status == 1) {
                             discoDisponivel = 1;
                             discos[i].status = 0; 
+                            precoDiariaDisco = discos[i].preco; // Captura o preço cadastrado no disco
                             salvarDiscosCSV(); 
                             
                             // [Obrigatório] Cópia segura do título do vinil com limite de caracteres
@@ -160,8 +163,10 @@ void menuLocacoes() {
                     printf("Tempo de Emprestimo (Dias): ");
                     scanf("%d", &novaLocacao.diasAlugados);
                     
-                    printf("Valor Cobrado (R$): ");
-                    scanf("%f", &novaLocacao.valorLocacao);
+                    // Calcula automaticamente o valor da locação multiplicando os dias pelo valor do disco
+                    novaLocacao.valorLocacao = novaLocacao.diasAlugados * precoDiariaDisco;
+                    printf("Valor Total do Aluguel (%d dias x R$ %.2f): R$ %.2f\n",
+                           novaLocacao.diasAlugados, precoDiariaDisco, novaLocacao.valorLocacao);
 
                     novaLocacao.idLocacao = totalLocacoes + 1;
                     historicoLocacoes[totalLocacoes] = novaLocacao;
