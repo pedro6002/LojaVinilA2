@@ -4,8 +4,6 @@
 // Autor: Braian Hladczuk - RGM: 04746379-1
 // ============================================================================
 
-#include <locale.h>
-
 #ifndef LOCACOES_H
 #define LOCACOES_H
 
@@ -91,6 +89,13 @@ void menuLocacoes() {
     lerClientes();
     carregarDiscosCSV();
     carregarLocacoesCSV();
+
+    // Verifica se é a primeira execução (nenhum cliente ou locação carregados dos arquivos .csv)
+    if (totalClientes == 0 || totalLocacoes == 0) {
+        printf("\n[INFO - PRIMEIRA EXECUCAO] Caso aparecam avisos de arquivos .csv nao encontrados acima,\n");
+        printf("isso ocorre porque o modo \"r\" do fopen retorna NULL enquanto nenhum registro for salvo.\n");
+        printf("Assim que o primeiro cliente e a primeira locacao forem cadastrados, os arquivos serao criados!\n");
+    }
 
     do {
         printf("\n======================================================\n");
