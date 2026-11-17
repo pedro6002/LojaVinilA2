@@ -1,8 +1,9 @@
 // ============================================================================
 // MÓDULO: PERSPECTIVA DE LOCAÇÃO E OPERAÇÃO DE VINIS (VERSÃO FINAL 100%)
 // Tema: Locadora de Discos de Vinil Retrô
-// Autor: Braian hladczuk - RGM: 04746379-1
+// Autor: Braian Hladczuk - RGM: 04746379-1
 // ============================================================================
+#include <locale.h>
 
 #ifndef LOCACOES_H
 #define LOCACOES_H
@@ -85,6 +86,11 @@ void menuLocacoes() {
     int idDiscoDigitado;
     struct LocacaoVinil novaLocacao;
 
+    // [Obrigatório] Sincronização dos arquivos CSV ao iniciar o módulo
+    lerClientes();
+    carregarDiscosCSV();
+    carregarLocacoesCSV();
+
     do {
         printf("\n======================================================\n");
         printf("     SISTEMA RETRO (1985) - MODULO DE LOCACOES        \n");
@@ -109,9 +115,11 @@ void menuLocacoes() {
                     scanf("%d", &novaLocacao.idClienteLocador);
                     
                     int clienteExiste = 0;
+                    int idxCliente = -1; // Guarda o índice do cliente para o bônus de integração
                     for (i = 0; i < totalClientes; i++) { 
                         if (clientes[i].id == novaLocacao.idClienteLocador && clientes[i].status == 1) {
                             clienteExiste = 1;
+                            idxCliente = i;
                             break;
                         }
                     }
@@ -131,8 +139,9 @@ void menuLocacoes() {
                             discos[i].status = 0; 
                             salvarDiscosCSV(); 
                             
-                            // Copia o código textual do vinil do Felipe para o registro de locação
-                            strcpy(novaLocacao.codigoVinil, discos[i].codigo);
+                            // [Obrigatório] Cópia segura do título do vinil com limite de caracteres
+                            strncpy(novaLocacao.codigoVinil, discos[i].titulo, 19);
+                            novaLocacao.codigoVinil[19] = '\0';
                             break;
                         }
                     }
@@ -152,6 +161,10 @@ void menuLocacoes() {
                     historicoLocacoes[totalLocacoes] = novaLocacao;
                     totalLocacoes++;
                     
+                    // [Bônus de Integração] Incrementa o contador do cliente e atualiza clientes.csv
+                    clientes[idxCliente].qtd_discos_alugados++;
+                    salvarClientes();
+
                     salvarLocacoesCSV(); 
                     printf("\nLocacao salva com sucesso e persistida em arquivo!\n");
                 }
@@ -206,5 +219,3 @@ void menuLocacoes() {
 }
 
 #endif
-
-
