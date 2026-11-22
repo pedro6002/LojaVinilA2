@@ -4,12 +4,13 @@
 // Autor: Braian Hladczuk - RGM: 04746379-1
 // ============================================================================
 
- #include <locale.h>
+#include <locale.h>
 
 #ifndef LOCACOES_H
 #define LOCACOES_H
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "clientes.h"
@@ -66,16 +67,18 @@ void carregarLocacoesCSV() {
     fclose(arquivo);
 }
 
-void ordenarLocacoesPorDias() {
+// Ordena uma cópia do vetor do aluguel mais caro para o mais barato (Bubble Sort)
+// Sem alterar a ordem original de inserção em historicoLocacoes[]
+void ordenarLocacoesPorValor(struct LocacaoVinil lista[], int qtd) {
     int i, j;
     struct LocacaoVinil aux;
 
-    for (i = 0; i < totalLocacoes - 1; i++) {
-        for (j = 0; j < totalLocacoes - i - 1; j++) {
-            if (historicoLocacoes[j].diasAlugados < historicoLocacoes[j + 1].diasAlugados) {
-                aux = historicoLocacoes[j];
-                historicoLocacoes[j] = historicoLocacoes[j + 1];
-                historicoLocacoes[j + 1] = aux;
+    for (i = 0; i < qtd - 1; i++) {
+        for (j = 0; j < qtd - i - 1; j++) {
+            if (lista[j].valorLocacao < lista[j + 1].valorLocacao) {
+                aux = lista[j];
+                lista[j] = lista[j + 1];
+                lista[j + 1] = aux;
             }
         }
     }
@@ -105,12 +108,13 @@ void menuLocacoes() {
         printf("======================================================\n");
         printf("1. Alugar Novo Vinil (Balcao)\n");
         printf("2. Listar Locacoes (Ordem de Insercao)\n");
-        printf("3. Relatorio: Alugueis Mais Longos (Bubble Sort)\n");
+        printf("3. Relatorio: Alugueis Mais Caros ate Mais Baratos (Bubble Sort)\n");
         printf("4. Relatorio: Receita Total de Locacoes\n");
         printf("0. Voltar ao Menu Principal\n");
         printf("======================================================\n");
         printf("Escolha uma acao: ");
         scanf("%d", &opcaoModulo);
+        system("cls"); // Limpa a tela ao trocar de função (mesmo padrão de discos.h)
 
         switch (opcaoModulo) {
             case 1:
@@ -118,36 +122,36 @@ void menuLocacoes() {
                     printf("\n[ERRO] Vetor cheio na memoria RAM!\n");
                 } else {
                     printf("\n--- Registrar Novo Aluguel ---\n");
-                    
+
                     printf("ID do Cliente: ");
                     scanf("%d", &novaLocacao.idClienteLocador);
-                    
+
                     int clienteExiste = 0;
-                    for (i = 0; i < totalClientes; i++) { 
+                    for (i = 0; i < totalClientes; i++) {
                         if (clientes[i].id == novaLocacao.idClienteLocador && clientes[i].status == 1) {
                             clienteExiste = 1;
                             break;
                         }
                     }
-                    
+
                     if (!clienteExiste) {
                         printf("\n[ERRO] Cliente ID %d nao encontrado ou inativo!\n", novaLocacao.idClienteLocador);
                         break;
                     }
 
-                    printf("ID do Disco do Felipe: ");
+                    printf("ID do Disco: ");
                     scanf("%d", &idDiscoDigitado);
-                    
-                    int discoDisponivel = 0;
-                    float precoDiariaDisco = 0.0; // Guarda o valor do disco para multiplicar pelos dias
 
-                    for (i = 0; i < totalDiscos; i++) { 
+                    int discoDisponivel = 0;
+                    float precoDiariaDisco = 0.0;
+
+                    for (i = 0; i < totalDiscos; i++) {
                         if (discos[i].id == idDiscoDigitado && discos[i].status == 1) {
                             discoDisponivel = 1;
-                            discos[i].status = 0; 
-                            precoDiariaDisco = discos[i].preco; // Captura o preço cadastrado no disco
-                            salvarDiscosCSV(); 
-                            
+                            discos[i].status = 0;
+                            precoDiariaDisco = discos[i].preco_locacao; // Campo oficial do discos.h
+                            salvarDiscosCSV();
+
                             // [Obrigatório] Cópia segura do título do vinil com limite de caracteres
                             strncpy(novaLocacao.codigoVinil, discos[i].titulo, 19);
                             novaLocacao.codigoVinil[19] = '\0';
@@ -162,23 +166,24 @@ void menuLocacoes() {
 
                     printf("Tempo de Emprestimo (Dias): ");
                     scanf("%d", &novaLocacao.diasAlugados);
-                    
-                    // Calcula automaticamente o valor da locação multiplicando os dias pelo valor do disco
+
+                    // Multiplica a quantidade de dias pelo preco_locacao cadastrado no discos.h
                     novaLocacao.valorLocacao = novaLocacao.diasAlugados * precoDiariaDisco;
+                    printf("\nValor da Diaria do Disco: R$ %.2f\n", precoDiariaDisco);
                     printf("Valor Total do Aluguel (%d dias x R$ %.2f): R$ %.2f\n",
                            novaLocacao.diasAlugados, precoDiariaDisco, novaLocacao.valorLocacao);
 
                     novaLocacao.idLocacao = totalLocacoes + 1;
                     historicoLocacoes[totalLocacoes] = novaLocacao;
                     totalLocacoes++;
-                    
-                    salvarLocacoesCSV(); 
+
+                    salvarLocacoesCSV();
                     printf("\nLocacao salva com sucesso e persistida em arquivo!\n");
                 }
                 break;
 
             case 2:
-                printf("\n--- Historico Geral de Locacoes ---\n");
+                printf("\n--- Historico Geral de Locacoes (Ordem de Insercao) ---\n");
                 if (totalLocacoes == 0) {
                     printf("Nenhuma locacao em memoria.\n");
                 } else {
@@ -193,18 +198,30 @@ void menuLocacoes() {
                 }
                 break;
 
-            case 3:
-                printf("\n--- Relatorio Analitico: Maiores Tempos de Emprestimo ---\n");
+            case 3: {
+                printf("\n--- Relatorio Analitico: Alugueis Mais Caros ate Mais Baratos ---\n");
                 if (totalLocacoes == 0) {
                     printf("Nao ha dados para ordenar.\n");
                 } else {
-                    ordenarLocacoesPorDias();
+                    // Cria uma cópia local para ordenar sem bagunçar o vetor original
+                    struct LocacaoVinil copiaLocacoes[50];
                     for (i = 0; i < totalLocacoes; i++) {
-                        printf("[%d Lugar] Vinil: %s | Dias Alugados: %d | Locacao ID: %d\n",
-                               i + 1, historicoLocacoes[i].codigoVinil, historicoLocacoes[i].diasAlugados, historicoLocacoes[i].idLocacao);
+                        copiaLocacoes[i] = historicoLocacoes[i];
+                    }
+
+                    ordenarLocacoesPorValor(copiaLocacoes, totalLocacoes);
+
+                    for (i = 0; i < totalLocacoes; i++) {
+                        printf("[%d Lugar] Vinil: %s | Valor: R$ %.2f | Dias: %d | Locacao ID: %d\n",
+                               i + 1,
+                               copiaLocacoes[i].codigoVinil,
+                               copiaLocacoes[i].valorLocacao,
+                               copiaLocacoes[i].diasAlugados,
+                               copiaLocacoes[i].idLocacao);
                     }
                 }
                 break;
+            }
 
             case 4: {
                 float receitaTotal = 0.0;
@@ -215,9 +232,11 @@ void menuLocacoes() {
                 printf("Faturamento Geral de Locacoes: R$ %.2f\n", receitaTotal);
                 break;
             }
+
             case 0:
                 printf("\nRetornando ao Menu Principal...\n");
                 break;
+
             default:
                 printf("\nOpcao incorreta!\n");
                 break;
