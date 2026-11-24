@@ -1,3 +1,9 @@
+// ============================================================================
+// MÓDULO: PERSPECTIVA DE DISCOS E PRATELEIRA DE VINIS
+// Tema: Locadora de Discos de Vinil Retrô
+// Autor: Felipe Mariano Bueno - RGM: 04831366-1
+// ============================================================================
+
 #ifndef DISCOS_H
 #define DISCOS_H
 
