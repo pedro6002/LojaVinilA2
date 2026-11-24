@@ -1,3 +1,10 @@
+// ============================================================================
+// MÓDULO: MANIPULAÇÃO E LISTAGEM DOS USUÁRIOS DO SISTEMA
+// Tema: Locadora de Discos de Vinil Retrô
+// Autor: João Victor Alves Padilha - RGM: 4771215-5
+// ============================================================================
+
+
 #ifndef CLIENTES_H
 #define CLIENTES_H
 
