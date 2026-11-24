@@ -1,3 +1,9 @@
+// ============================================================================
+// MÓDULO: PERSPECTIVA DE GÊNEROS DOS VINIS
+// Tema: Locadora de Discos de Vinil Retrô
+// Autor: Pedro Henrique do Nascimento - RGM: 04792662-4
+// ============================================================================
+
 #ifndef GENEROS_H
 #define GENEROS_H
 
