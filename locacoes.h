@@ -4,14 +4,13 @@
 // Autor: Braian Hladczuk - RGM: 04746379-1
 // ============================================================================
 
-#include <locale.h>
-
 #ifndef LOCACOES_H
 #define LOCACOES_H
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <locale.h>
 
 #include "clientes.h"
 #include "discos.h"
@@ -30,7 +29,7 @@ int totalLocacoes = 0;
 void salvarLocacoesCSV() {
     FILE *arquivo = fopen("locacoes.csv", "w");
     if (arquivo == NULL) {
-        printf("\n[ERRO] Nao foi possivel abrir o arquivo locacoes.csv para escrita.\n");
+        printf("\n[ERRO] Não foi possível abrir o arquivo locacoes.csv para escrita.\n");
         return;
     }
 
@@ -49,7 +48,7 @@ void salvarLocacoesCSV() {
 void carregarLocacoesCSV() {
     FILE *arquivo = fopen("locacoes.csv", "r");
     if (arquivo == NULL) {
-        printf("\n[AVISO] Arquivo locacoes.csv nao encontrado. Um novo sera criado ao salvar.\n");
+        printf("\n[AVISO] Arquivo locacoes.csv não encontrado. Um novo será criado ao salvar.\n");
         totalLocacoes = 0;
         return;
     }
@@ -85,6 +84,9 @@ void ordenarLocacoesPorValor(struct LocacaoVinil lista[], int qtd) {
 }
 
 void menuLocacoes() {
+    // Ativa acentuação em português no console sem alterar o ponto decimal dos CSVs
+    setlocale(LC_CTYPE, "Portuguese");
+
     int opcaoModulo;
     int i;
     int idDiscoDigitado;
@@ -97,29 +99,29 @@ void menuLocacoes() {
 
     // Verifica se é a primeira execução (nenhum cliente ou locação carregados dos arquivos .csv)
     if (totalClientes == 0 || totalLocacoes == 0) {
-        printf("\n[INFO - PRIMEIRA EXECUCAO] Caso aparecam avisos de arquivos .csv nao encontrados acima,\n");
+        printf("\n[INFO - PRIMEIRA EXECUÇÃO] Caso apareçam avisos de arquivos .csv não encontrados acima,\n");
         printf("isso ocorre porque o modo \"r\" do fopen retorna NULL enquanto nenhum registro for salvo.\n");
-        printf("Assim que o primeiro cliente e a primeira locacao forem cadastrados, os arquivos serao criados!\n");
+        printf("Assim que o primeiro cliente e a primeira locação forem cadastrados, os arquivos serão criados!\n");
     }
 
     do {
         printf("\n======================================================\n");
-        printf("     SISTEMA RETRO (1985) - MODULO DE LOCACOES        \n");
+        printf("     SISTEMA RETRÔ (1985) - MÓDULO DE LOCAÇÕES        \n");
         printf("======================================================\n");
-        printf("1. Alugar Novo Vinil (Balcao)\n");
-        printf("2. Listar Locacoes (Ordem de Insercao)\n");
-        printf("3. Relatorio: Alugueis Mais Caros ate Mais Baratos (Bubble Sort)\n");
-        printf("4. Relatorio: Receita Total de Locacoes\n");
+        printf("1. Alugar Novo Vinil (Balcão)\n");
+        printf("2. Listar Locações (Ordem de Inserção)\n");
+        printf("3. Relatório: Aluguéis Mais Caros até Mais Baratos (Bubble Sort)\n");
+        printf("4. Relatório: Receita Total de Locações\n");
         printf("0. Voltar ao Menu Principal\n");
         printf("======================================================\n");
-        printf("Escolha uma acao: ");
+        printf("Escolha uma ação: ");
         scanf("%d", &opcaoModulo);
         system("cls"); // Limpa a tela ao trocar de função (mesmo padrão de discos.h)
 
         switch (opcaoModulo) {
             case 1:
                 if (totalLocacoes >= 50) {
-                    printf("\n[ERRO] Vetor cheio na memoria RAM!\n");
+                    printf("\n[ERRO] Vetor cheio na memória RAM!\n");
                 } else {
                     printf("\n--- Registrar Novo Aluguel ---\n");
 
@@ -135,7 +137,7 @@ void menuLocacoes() {
                     }
 
                     if (!clienteExiste) {
-                        printf("\n[ERRO] Cliente ID %d nao encontrado ou inativo!\n", novaLocacao.idClienteLocador);
+                        printf("\n[ERRO] Cliente ID %d não encontrado ou inativo!\n", novaLocacao.idClienteLocador);
                         break;
                     }
 
@@ -160,16 +162,16 @@ void menuLocacoes() {
                     }
 
                     if (!discoDisponivel) {
-                        printf("\n[ERRO] Disco ID %d nao encontrado ou ja esta alugado!\n", idDiscoDigitado);
+                        printf("\n[ERRO] Disco ID %d não encontrado ou já está alugado!\n", idDiscoDigitado);
                         break;
                     }
 
-                    printf("Tempo de Emprestimo (Dias): ");
+                    printf("Tempo de Empréstimo (Dias): ");
                     scanf("%d", &novaLocacao.diasAlugados);
 
                     // Multiplica a quantidade de dias pelo preco_locacao cadastrado no discos.h
                     novaLocacao.valorLocacao = novaLocacao.diasAlugados * precoDiariaDisco;
-                    printf("\nValor da Diaria do Disco: R$ %.2f\n", precoDiariaDisco);
+                    printf("\nValor da Diária do Disco: R$ %.2f\n", precoDiariaDisco);
                     printf("Valor Total do Aluguel (%d dias x R$ %.2f): R$ %.2f\n",
                            novaLocacao.diasAlugados, precoDiariaDisco, novaLocacao.valorLocacao);
 
@@ -178,14 +180,14 @@ void menuLocacoes() {
                     totalLocacoes++;
 
                     salvarLocacoesCSV();
-                    printf("\nLocacao salva com sucesso e persistida em arquivo!\n");
+                    printf("\nLocação salva com sucesso e persistida em arquivo!\n");
                 }
                 break;
 
             case 2:
-                printf("\n--- Historico Geral de Locacoes (Ordem de Insercao) ---\n");
+                printf("\n--- Histórico Geral de Locações (Ordem de Inserção) ---\n");
                 if (totalLocacoes == 0) {
-                    printf("Nenhuma locacao em memoria.\n");
+                    printf("Nenhuma locação em memória.\n");
                 } else {
                     for (i = 0; i < totalLocacoes; i++) {
                         printf("ID: %d | Cliente ID: %d | Vinil: %s | Dias: %d | Valor: R$ %.2f\n",
@@ -199,9 +201,9 @@ void menuLocacoes() {
                 break;
 
             case 3: {
-                printf("\n--- Relatorio Analitico: Alugueis Mais Caros ate Mais Baratos ---\n");
+                printf("\n--- Relatório Analítico: Aluguéis Mais Caros até Mais Baratos ---\n");
                 if (totalLocacoes == 0) {
-                    printf("Nao ha dados para ordenar.\n");
+                    printf("Não há dados para ordenar.\n");
                 } else {
                     // Cria uma cópia local para ordenar sem bagunçar o vetor original
                     struct LocacaoVinil copiaLocacoes[50];
@@ -212,7 +214,7 @@ void menuLocacoes() {
                     ordenarLocacoesPorValor(copiaLocacoes, totalLocacoes);
 
                     for (i = 0; i < totalLocacoes; i++) {
-                        printf("[%d Lugar] Vinil: %s | Valor: R$ %.2f | Dias: %d | Locacao ID: %d\n",
+                        printf("[%dº Lugar] Vinil: %s | Valor: R$ %.2f | Dias: %d | Locação ID: %d\n",
                                i + 1,
                                copiaLocacoes[i].codigoVinil,
                                copiaLocacoes[i].valorLocacao,
@@ -229,7 +231,7 @@ void menuLocacoes() {
                 for (i = 0; i < totalLocacoes; i++) {
                     receitaTotal += historicoLocacoes[i].valorLocacao;
                 }
-                printf("Faturamento Geral de Locacoes: R$ %.2f\n", receitaTotal);
+                printf("Faturamento Geral de Locações: R$ %.2f\n", receitaTotal);
                 break;
             }
 
@@ -238,7 +240,7 @@ void menuLocacoes() {
                 break;
 
             default:
-                printf("\nOpcao incorreta!\n");
+                printf("\nOpção incorreta!\n");
                 break;
         }
     } while (opcaoModulo != 0);
