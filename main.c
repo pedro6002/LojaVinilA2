@@ -2,6 +2,10 @@
 #include <stdlib.h>
 #include <locale.h>
 
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
 // Inclusão dos módulos (headers) que gerenciam cada entidade do sistema
 #include "clientes.h"
 #include "discos.h"
@@ -33,8 +37,13 @@ void selecionarMenu(int opcao) {
 }
 
 int main() {
+    #ifdef _WIN32
+        SetConsoleOutputCP(65001);
+        SetConsoleCP(65001);
+    #endif
+    
     // Configura a codificação de caracteres para suportar acentuação no terminal
-    setlocale(LC_CTYPE, "");
+    setlocale(LC_CTYPE, "pt_br.UTF-8");
 
     // Carrega todos os dados previamente salvos nos arquivos para a memória
     lerClientes();
